@@ -29,7 +29,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .container {
-  background-color: #fffbc9;
+  background-color: #fffcd5;
 }
 
 .title {

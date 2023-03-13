@@ -4,3 +4,16 @@
     font-family: fredoka;
     src: url(./fonts/FredokaOne-Regular.woff);
   }
+
+  video {
+    border-radius: 1em;
+  }
+
+  .overlay-element {
+    border-radius: 1em;
+  }
+
+  .under-title {
+    color: $secondary;
+    text-align: center;
+  }
