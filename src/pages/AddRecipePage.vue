@@ -80,10 +80,18 @@
           v-model="dialogIsOpen"
           @new-ingredient="addIngredient($event)"
         />
+
+        <alert-dialog
+          :title="alertTitle"
+          :text="alertText"
+          :icon="alertIcon"
+          v-model="alert"
+        />
       </q-card-section>
 
       <q-card-section class="full-width"
         ><div class="under-title full-width text-overline">- Étapes -</div>
+
         <div
           v-for="(step, index) in steps"
           :key="index"
@@ -94,13 +102,14 @@
           <div class="full-widthc text-secondary">
             {{ index + 1 }}{{ index == 0 ? "ère" : "ème" }} étape
           </div>
-          <q-input filled v-model="description" type="textarea"></q-input>
+          <q-input filled v-model="step.description" type="textarea"></q-input>
         </div>
+
         <div class="flex justify-center col-12">
           <add-button
             label="Ajouter une étape"
             icon="add_circle"
-            @click="addStep(index, description)"
+            @click="addStep(index)"
           />
         </div>
       </q-card-section>
@@ -116,12 +125,19 @@
 import InputTime from "src/components/InputTime.vue";
 import AddButton from "src/components/AddButton.vue";
 import ValidateButton from "src/components/ValidateButton.vue";
+import AlertDialog from "src/components/AlertDialog.vue";
 import NewFoodDialog from "src/components/NewFoodDialog.vue";
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "AddRecipePage",
-  components: { InputTime, AddButton, NewFoodDialog, ValidateButton },
+  components: {
+    InputTime,
+    AddButton,
+    AlertDialog,
+    NewFoodDialog,
+    ValidateButton,
+  },
 
   setup() {
     return {
@@ -147,6 +163,10 @@ export default defineComponent({
       ingredients: ref([]),
       steps: ref([{ id: 1, description: "" }]),
       description: ref(""),
+      alert: ref(false),
+      alertTitle: ref("Information"),
+      alertText: ref("Vous avez déjà ajouté cet ingrédient."),
+      alertIcon: ref("info"),
     };
   },
 
@@ -157,20 +177,18 @@ export default defineComponent({
     addIngredient(val) {
       const ingredientList = [...this.ingredients];
       if (ingredientList.length === 0) {
-        console.log("if");
         this.ingredientsIdList.push(val.id);
         this.ingredients.push(val);
       } else if (this.ingredientsIdList.includes(val.id)) {
-        console.log("else if");
-        console.log("ingrédient déjà ajouté");
+        this.alert = true;
       } else {
-        console.log("else");
         this.ingredientsIdList.push(val.id);
         this.ingredients.push(val);
       }
     },
-    addStep(index, description) {
-      this.steps.push({ id: index + 1, description: description });
+    addStep(index) {
+      this.steps.push({ id: index + 1, description: "" });
+      this.description = "";
     },
   },
 });
