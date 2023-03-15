@@ -49,7 +49,12 @@
         <div class="under-title full-width text-overline">- Ingrédients -</div>
         <div v-if="ingredients.length > 0" class="row q-pt-none q-mb-md">
           <q-list v-for="(ingredient, index) in ingredients" :key="index">
-            <q-item dense class="q-pl-none q-ml-none">
+            <q-item
+              clickable
+              dense
+              class="q-pl-none q-ml-none"
+              @click="showIngredient(ingredient, index)"
+            >
               <q-item-section top avatar>
                 <q-avatar color="secondary" text-color="white" icon="nutrition">
                   <!-- <img :src="ingredient.img" /> -->
@@ -72,13 +77,20 @@
           <add-button
             label="Ajouter un ingrédient"
             icon="add_circle"
-            @click="openDialog"
+            @click="openNewFoodDialog"
           />
         </div>
 
         <new-food-dialog
-          v-model="dialogIsOpen"
+          v-model="newFoodDialogIsOpen"
           @new-ingredient="addIngredient($event)"
+        />
+
+        <update-food-dialog
+          v-model="updateFoodDialogIsOpen"
+          :food="ingredientSelected"
+          @update-ingredient="updateIngredient($event)"
+          @delete-ingredient="deleteIngredient()"
         />
 
         <alert-dialog
@@ -114,8 +126,8 @@
         </div>
       </q-card-section>
 
-      <q-card-actions
-        ><validate-button label="Valider la recette" class="q-mb-lg"
+      <q-card-actions class="justify-center"
+        ><validate-button label="Sauvegarder la recette" class="q-mb-lg"
       /></q-card-actions>
     </q-card>
   </q-page>
@@ -127,6 +139,7 @@ import AddButton from "src/components/AddButton.vue";
 import ValidateButton from "src/components/ValidateButton.vue";
 import AlertDialog from "src/components/AlertDialog.vue";
 import NewFoodDialog from "src/components/NewFoodDialog.vue";
+import UpdateFoodDialog from "src/components/UpdateFoodDialog.vue";
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
@@ -136,6 +149,7 @@ export default defineComponent({
     AddButton,
     AlertDialog,
     NewFoodDialog,
+    UpdateFoodDialog,
     ValidateButton,
   },
 
@@ -158,9 +172,12 @@ export default defineComponent({
       preparationTime: ref(15),
       restTime: ref(0),
       cookingTime: ref(15),
-      dialogIsOpen: ref(false),
+      newFoodDialogIsOpen: ref(false),
+      updateFoodDialogIsOpen: ref(false),
       ingredientsIdList: ref([]),
       ingredients: ref([]),
+      ingredientSelected: ref(null),
+      ingredientSelectedId: ref(0),
       steps: ref([{ id: 1, description: "" }]),
       description: ref(""),
       alert: ref(false),
@@ -171,21 +188,46 @@ export default defineComponent({
   },
 
   methods: {
-    openDialog() {
-      this.dialogIsOpen = !this.dialogIsOpen;
+    openNewFoodDialog() {
+      this.newFoodDialogIsOpen = true;
     },
-    addIngredient(val) {
+    openUpdateDialog() {
+      this.updateFoodDialogIsOpen = true;
+    },
+    addIngredient(ingredient) {
       const ingredientList = [...this.ingredients];
       if (ingredientList.length === 0) {
-        this.ingredientsIdList.push(val.id);
-        this.ingredients.push(val);
-      } else if (this.ingredientsIdList.includes(val.id)) {
+        this.ingredientsIdList.push(ingredient.id);
+        this.ingredients.push(ingredient);
+      } else if (this.ingredientsIdList.includes(ingredient.id)) {
+        console.log(this.ingredientsIdList, ingredient.id);
         this.alert = true;
       } else {
-        this.ingredientsIdList.push(val.id);
-        this.ingredients.push(val);
+        this.ingredientsIdList.push(ingredient.id);
+        this.ingredients.push(ingredient);
       }
     },
+    showIngredient(ingredient, index) {
+      this.ingredientSelected = ingredient;
+      this.updateFoodDialogIsOpen = true;
+      this.ingredientSelectedId = index;
+    },
+    updateIngredient(ingredient) {
+      this.ingredients[this.ingredientSelectedId] = ingredient;
+    },
+    deleteIngredient() {
+      const ingredientsList = [...this.ingredients];
+      let newIngredientsIdList = [...this.ingredientsIdList];
+      const id = [ingredientsList[this.ingredientSelectedId].id];
+      newIngredientsIdList = newIngredientsIdList.filter(
+        (element) => !id.includes(element)
+      );
+      ingredientsList.splice(this.ingredientSelectedId, 1);
+      this.ingredients = ingredientsList;
+      this.ingredientsIdList = newIngredientsIdList;
+      this.updateFoodDialogIsOpen = false;
+    },
+
     addStep(index) {
       this.steps.push({ id: index + 1, description: "" });
       this.description = "";

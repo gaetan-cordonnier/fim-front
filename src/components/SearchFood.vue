@@ -61,11 +61,5 @@ export default defineComponent({
     //     });
     //   },
   },
-
-  watch: {
-    stringOptions(val) {
-      console.log(val);
-    },
-  },
 });
 </script>

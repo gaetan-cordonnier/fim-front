@@ -1,11 +1,5 @@
 <template>
-  <q-btn
-    :label="label"
-    no-caps
-    unelevated
-    class="button full-width"
-    color="primary"
-  />
+  <q-btn :label="label" no-caps unelevated class="button" color="primary" />
 </template>
 
 <script>
@@ -20,5 +14,8 @@ export default defineComponent({
 <style scoped>
 .button {
   border-radius: 0.5em;
+  height: 50px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 </style>

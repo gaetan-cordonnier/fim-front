@@ -1,15 +1,17 @@
 <template>
   <q-dialog persistent>
     <q-card class="dialog full-width">
-      <q-card-section>
-        <div class="text-h6 text-primary">Ajouter un ingrédient</div>
+      <q-card-section class="row justify-between">
+        <div class="text-h6 text-primary">Modifier un ingrédient</div>
+        <q-icon
+          name="delete"
+          size="md"
+          color="grey-7"
+          @click="deleteIngredient()"
+        />
       </q-card-section>
 
-      <q-card-section v-if="!food" class="q-pt-none">
-        <search-food v-model="food" />
-      </q-card-section>
-
-      <q-card-section class="row q-col-gutter-sm" v-else>
+      <q-card-section class="row q-col-gutter-sm">
         <div class="col-12">
           <q-input v-model="foodName" filled readonly />
         </div>
@@ -33,20 +35,8 @@
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary">
-        <q-btn
-          flat
-          label="Annuler"
-          v-close-popup
-          color="grey-6"
-          @click="food = null"
-        />
-        <q-btn
-          v-if="foodName !== ''"
-          flat
-          label="Ajouter"
-          @click="addIngredient"
-          v-close-popup
-        />
+        <q-btn flat label="Annuler" v-close-popup color="grey-6" />
+        <q-btn flat label="Modifier" @click="updateIngredient" v-close-popup />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -54,44 +44,41 @@
 
 <script>
 import { defineComponent, ref } from "vue";
-import SearchFood from "./SearchFood.vue";
 
 export default defineComponent({
-  components: { SearchFood },
   name: "NewFoodDialog",
 
-  emits: ["new-ingredient"],
+  props: ["food"],
+
+  emits: ["update-ingredient", "delete-ingredient"],
 
   setup() {
     return {
-      food: ref(null),
       foodName: ref(""),
       quantity: ref(1),
       unitOptions: ref(["kg", "g", "mg", "l", "dl", "cl", "ml", "pièce"]),
       unitType: ref("g"),
-      ingredients: ref([]),
     };
   },
 
   methods: {
-    addIngredient() {
-      const { id, label, img } = this.food;
-      const newIngredient = {
-        id: id,
-        name: label,
+    updateIngredient() {
+      const ingredient = {
+        id: this.food.id,
+        name: this.food.name,
         quantity: this.quantity,
         unit: this.unitType,
-        img: img,
+        img: this.food.img,
       };
-      this.food ? this.$emit("new-ingredient", newIngredient) : false;
-      this.food = null;
+      this.$emit("update-ingredient", ingredient);
+    },
+    deleteIngredient() {
+      this.$emit("delete-ingredient");
     },
   },
 
-  watch: {
-    food(val) {
-      val ? (this.foodName = val.label) : false;
-    },
+  updated() {
+    this.foodName = this.food.name;
   },
 });
 </script>
