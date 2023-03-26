@@ -27,6 +27,7 @@
         <home-button icon="menu_book" label="Menu" />
       </div>
     </q-card>
+
     <q-card
       v-if="scannerIsOpen"
       class="scanner-card bg-transparent"
