@@ -15,7 +15,7 @@
         <home-button icon="add_circle" label="Aliment" @click="openScanner" />
       </div>
       <div class="col-6">
-        <home-button icon="restaurant_menu" label="Cuisiner" />
+        <home-button icon="restaurant_menu" label="Cuisiner" to="/cooking" />
       </div>
       <div class="col-6">
         <home-button icon="edit_note" label="Recette" to="/add-recipe" />
