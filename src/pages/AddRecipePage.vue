@@ -6,10 +6,15 @@
           - Nouvelle recette -
         </div>
         <div class="col-12 q-pt-none">
-          <q-input filled v-model="title" label="Titre" />
+          <q-input
+            filled
+            v-model="title"
+            label="Titre"
+            :rules="[(val) => !!val || 'Ce champ est obligatoire']"
+          />
         </div>
         <div class="col-4">
-          <q-select filled dense v-model="nbPerson" :options="nbPersonOptions">
+          <q-select filled v-model="nbPerson" :options="nbPersonOptions">
             <template v-slot:prepend>
               <q-icon name="person" />
             </template>
@@ -18,7 +23,6 @@
         <div class="col-8">
           <q-select
             filled
-            dense
             v-model="type"
             label="Type de recette"
             :options="typeOptions"
@@ -114,20 +118,45 @@
           <div class="full-widthc text-secondary">
             {{ index + 1 }}{{ index == 0 ? "ère" : "ème" }} étape
           </div>
-          <q-input filled v-model="step.description" type="textarea"></q-input>
+          <q-input
+            filled
+            v-model="step.description"
+            autogrow
+            readonly
+            @click="showStep(steps[index], index)"
+          ></q-input>
         </div>
 
         <div class="flex justify-center col-12">
           <add-button
             label="Ajouter une étape"
             icon="add_circle"
-            @click="addStep(index)"
+            @click="openNewStepDialog"
           />
         </div>
       </q-card-section>
 
+      <new-step-dialog
+        v-model="newStepDialogIsOpen"
+        :stepIndex="
+          steps[0].description === '' ? steps.length : steps.length + 1
+        "
+        @new-step="addStep($event, steps.length)"
+      />
+
+      <update-step-dialog
+        v-model="updateStepDialogIsOpen"
+        :stepSelected="stepSelected"
+        :stepIndex="stepSelectedId"
+        @update-step="updateStep($event)"
+        @delete-step="deleteStep()"
+      />
+
       <q-card-actions class="justify-center"
-        ><validate-button label="Sauvegarder la recette" class="q-mb-lg"
+        ><validate-button
+          label="Sauvegarder la recette"
+          class="q-mb-lg"
+          @click="saveRecipe"
       /></q-card-actions>
     </q-card>
   </q-page>
@@ -140,7 +169,11 @@ import ValidateButton from "src/components/ValidateButton.vue";
 import AlertDialog from "src/components/AlertDialog.vue";
 import NewFoodDialog from "src/components/NewFoodDialog.vue";
 import UpdateFoodDialog from "src/components/UpdateFoodDialog.vue";
+import NewStepDialog from "src/components/NewStepDialog.vue";
+import UpdateStepDialog from "src/components/UpdateStepDialog.vue";
 import { defineComponent, ref } from "vue";
+import { errorMessage } from "src/utils/Notify";
+import { useRecipeStore } from "src/stores/recipeStore";
 
 export default defineComponent({
   name: "AddRecipePage",
@@ -150,10 +183,13 @@ export default defineComponent({
     AlertDialog,
     NewFoodDialog,
     UpdateFoodDialog,
+    NewStepDialog,
+    UpdateStepDialog,
     ValidateButton,
   },
 
   setup() {
+    const store = useRecipeStore();
     return {
       title: ref(""),
       nbPerson: ref(4),
@@ -174,16 +210,21 @@ export default defineComponent({
       cookingTime: ref(15),
       newFoodDialogIsOpen: ref(false),
       updateFoodDialogIsOpen: ref(false),
+      newStepDialogIsOpen: ref(false),
+      updateStepDialogIsOpen: ref(false),
       ingredientsIdList: ref([]),
       ingredients: ref([]),
       ingredientSelected: ref(null),
       ingredientSelectedId: ref(0),
       steps: ref([{ id: 1, description: "" }]),
+      stepSelected: ref(null),
+      stepSelectedId: ref(0),
       description: ref(""),
       alert: ref(false),
       alertTitle: ref("Information"),
       alertText: ref("Vous avez déjà ajouté cet ingrédient."),
       alertIcon: ref("info"),
+      store,
     };
   },
 
@@ -194,13 +235,15 @@ export default defineComponent({
     openUpdateDialog() {
       this.updateFoodDialogIsOpen = true;
     },
+    openNewStepDialog() {
+      this.newStepDialogIsOpen = true;
+    },
     addIngredient(ingredient) {
       const ingredientList = [...this.ingredients];
       if (ingredientList.length === 0) {
         this.ingredientsIdList.push(ingredient.id);
         this.ingredients.push(ingredient);
       } else if (this.ingredientsIdList.includes(ingredient.id)) {
-        console.log(this.ingredientsIdList, ingredient.id);
         this.alert = true;
       } else {
         this.ingredientsIdList.push(ingredient.id);
@@ -209,8 +252,8 @@ export default defineComponent({
     },
     showIngredient(ingredient, index) {
       this.ingredientSelected = ingredient;
-      this.updateFoodDialogIsOpen = true;
       this.ingredientSelectedId = index;
+      this.updateFoodDialogIsOpen = true;
     },
     updateIngredient(ingredient) {
       this.ingredients[this.ingredientSelectedId] = ingredient;
@@ -227,10 +270,62 @@ export default defineComponent({
       this.ingredientsIdList = newIngredientsIdList;
       this.updateFoodDialogIsOpen = false;
     },
+    addStep(newStep, index) {
+      this.steps[0].description === ""
+        ? (this.steps = [{ id: 1, description: newStep }])
+        : this.steps.push({ id: index + 1, description: newStep });
+    },
+    showStep(step, index) {
+      if (index === 0 && step.description === "") {
+        this.newStepDialogIsOpen = true;
+      } else {
+        this.stepSelected = step;
+        this.stepSelectedId = index;
+        this.updateStepDialogIsOpen = true;
+      }
+    },
+    updateStep(step) {
+      this.steps[this.stepSelectedId] = step;
+    },
+    deleteStep() {
+      this.steps.splice(this.stepSelectedId, 1);
+    },
+    saveRecipe() {
+      if (this.title.length == 0) {
+        errorMessage("Veuillez renseigner le titre");
+      } else if (this.preparationTime === 0 || this.preparationTime === "") {
+        errorMessage("Veuillez renseigner le temps de préparation");
+      } else if (this.preparationTime === 0 || this.preparationTime === null) {
+        errorMessage("Veuillez renseigner le temps de préparation");
+      } else if (this.ingredients.length <= 1) {
+        errorMessage("Veuillez ajouter au moins 2 ingrédients");
+      } else if (this.steps[0].description === "") {
+        errorMessage("Veuillez ajouter au moins 1 étape");
+      } else {
+        const recipe = {
+          type: this.type,
+          title: this.title,
+          nbPerson: this.nbPerson,
+          preparationTime: this.preparationTime,
+          restTime: this.restTime,
+          cookingTime: this.cookingTime,
+          ingredients: this.ingredients,
+          steps: this.steps,
+        };
+        this.store.addRecipe(recipe);
+      }
+    },
+  },
 
-    addStep(index) {
-      this.steps.push({ id: index + 1, description: "" });
-      this.description = "";
+  watch: {
+    preparationTime(val) {
+      val !== "" ? (this.preparationTime = parseInt(val)) : false;
+    },
+    restTime(val) {
+      val !== "" ? (this.restTime = parseInt(val)) : false;
+    },
+    cookingTime(val) {
+      val !== "" ? (this.cookingTime = parseInt(val)) : false;
     },
   },
 });

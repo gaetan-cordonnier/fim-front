@@ -1,7 +1,6 @@
 <template>
   <q-input
     filled
-    dense
     :label="label"
     suffix="min"
     maxlength="3"
@@ -21,6 +20,7 @@ export default defineComponent({
   props: ["label", "icon"],
 });
 </script>
+
 <style lang="scss">
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
