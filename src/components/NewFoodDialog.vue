@@ -41,11 +41,10 @@
           @click="food = null"
         />
         <q-btn
-          v-if="foodName !== ''"
           flat
           label="Ajouter"
           @click="addIngredient"
-          v-close-popup
+          v-close-popup="closeDialog"
         />
       </q-card-actions>
     </q-card>
@@ -70,21 +69,26 @@ export default defineComponent({
       unitOptions: ref(["kg", "g", "mg", "l", "dl", "cl", "ml", "pièce"]),
       unitType: ref("g"),
       ingredients: ref([]),
+      closeDialog: ref(false),
     };
   },
 
   methods: {
     addIngredient() {
-      const { id, label, img } = this.food;
-      const newIngredient = {
-        id: id,
-        name: label,
-        quantity: this.quantity,
-        unit: this.unitType,
-        img: img,
-      };
-      this.food ? this.$emit("new-ingredient", newIngredient) : false;
-      this.food = null;
+      if (this.food) {
+        const { id, label, img } = this.food;
+        const newIngredient = {
+          id: id,
+          name: label,
+          quantity: this.quantity,
+          unit: this.unitType,
+          img: img,
+        };
+        this.food ? this.$emit("new-ingredient", newIngredient) : false;
+        this.food = null;
+        this.foodName = "";
+        this.closeDialog = true;
+      }
     },
   },
 
