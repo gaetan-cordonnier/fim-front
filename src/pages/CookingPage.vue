@@ -1,5 +1,5 @@
 <template>
-  <q-page class="flex flex-center">
+  <q-page class="flex justify-center">
     <div class="q-pa-md">
       <div class="q-gutter-y-md" style="max-width: 350px">
         <q-option-group
@@ -32,49 +32,47 @@
   </q-page>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue";
+<script setup>
+import { onMounted, ref } from "vue";
 import { useRecipeStore } from "src/stores/recipeStore";
 
-export default defineComponent({
-  name: "CookingPage",
+const store = useRecipeStore();
+const { allRecipes } = store;
+const plats = ref([]);
+const desserts = ref([]);
+const entrees = ref([]);
+const aperos = ref([]);
+const boissons = ref([]);
+const autres = ref([]);
+const panel = ref({});
 
-  setup() {
-    const store = useRecipeStore();
-    const { allRecipes } = store;
-    const plats = [];
-    const desserts = [];
-    const entrees = [];
-    const aperos = [];
-    const boissons = [];
-    const autres = [];
+onMounted(() => {
+  console.log(allRecipes);
+});
 
-    allRecipes.forEach((recipe) => {
-      const recipeType = recipe.type;
-      switch (recipeType) {
-        case "Plat":
-          plats.push(recipe);
-          break;
-        case "Dessert":
-          desserts.push(recipe);
-          break;
-        case "Entrée":
-          entrees.push(recipe);
-          break;
-        case "Apéro":
-          aperos.push(recipe);
-          break;
-        case "Boisson":
-          boissons.push(recipe);
-          break;
-        case "Autres":
-          autres.push(recipe);
-          break;
-        default:
-          false;
-      }
-    });
-    return { allRecipes, panel: ref("Plat") };
-  },
+allRecipes.forEach((recipe) => {
+  const recipeType = recipe.type;
+  switch (recipeType) {
+    case "Plat":
+      plats.value.push(recipe);
+      break;
+    case "Dessert":
+      desserts.value.push(recipe);
+      break;
+    case "Entrée":
+      entrees.value.push(recipe);
+      break;
+    case "Apéro":
+      aperos.value.push(recipe);
+      break;
+    case "Boisson":
+      boissons.value.push(recipe);
+      break;
+    case "Autres":
+      autres.value.push(recipe);
+      break;
+    default:
+      false;
+  }
 });
 </script>

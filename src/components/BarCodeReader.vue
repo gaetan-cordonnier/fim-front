@@ -2,15 +2,8 @@
   <StreamBarcodeReader class="scanner" />
 </template>
 
-<script>
-import { defineComponent } from "vue";
+<script setup>
 import { StreamBarcodeReader } from "vue-barcode-reader";
-
-export default defineComponent({
-  name: "BarCodeReader",
-
-  components: { StreamBarcodeReader },
-});
 </script>
 
 <style scoped>

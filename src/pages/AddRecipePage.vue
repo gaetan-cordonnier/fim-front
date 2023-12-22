@@ -162,7 +162,8 @@
   </q-page>
 </template>
 
-<script>
+<script setup>
+import { ref, watch } from "vue";
 import InputTime from "src/components/InputTime.vue";
 import AddButton from "src/components/AddButton.vue";
 import ValidateButton from "src/components/ValidateButton.vue";
@@ -171,163 +172,151 @@ import NewFoodDialog from "src/components/NewFoodDialog.vue";
 import UpdateFoodDialog from "src/components/UpdateFoodDialog.vue";
 import NewStepDialog from "src/components/NewStepDialog.vue";
 import UpdateStepDialog from "src/components/UpdateStepDialog.vue";
-import { defineComponent, ref } from "vue";
 import { errorMessage } from "src/utils/Notify";
 import { useRecipeStore } from "src/stores/recipeStore";
 
-export default defineComponent({
-  name: "AddRecipePage",
-  components: {
-    InputTime,
-    AddButton,
-    AlertDialog,
-    NewFoodDialog,
-    UpdateFoodDialog,
-    NewStepDialog,
-    UpdateStepDialog,
-    ValidateButton,
-  },
+const store = useRecipeStore();
+const title = ref("");
+const nbPerson = ref(4);
+const nbPersonOptions = ref([
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+]);
+const type = ref("Plat");
+const typeOptions = ref([
+  "Plat",
+  "Dessert",
+  "Entrée",
+  "Apéro",
+  "Boisson",
+  "Autre",
+]);
+const preparationTime = ref(15);
+const restTime = ref(0);
+const cookingTime = ref(15);
+const newFoodDialogIsOpen = ref(false);
+const updateFoodDialogIsOpen = ref(false);
+const newStepDialogIsOpen = ref(false);
+const updateStepDialogIsOpen = ref(false);
+const ingredientsIdList = ref([]);
+const ingredients = ref([]);
+const ingredientSelected = ref(null);
+const ingredientSelectedId = ref(0);
+const steps = ref([{ id: 1, description: "" }]);
+const stepSelected = ref({});
+const stepSelectedId = ref(0);
+const alert = ref(false);
+const alertTitle = ref("Information");
+const alertText = ref("Vous avez déjà ajouté cet ingrédient.");
+const alertIcon = ref("info");
 
-  setup() {
-    const store = useRecipeStore();
-    return {
-      title: ref(""),
-      nbPerson: ref(4),
-      nbPersonOptions: ref([
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-      ]),
-      type: ref("Plat"),
-      typeOptions: ref([
-        "Plat",
-        "Dessert",
-        "Entrée",
-        "Apéro",
-        "Boisson",
-        "Autre",
-      ]),
-      preparationTime: ref(15),
-      restTime: ref(0),
-      cookingTime: ref(15),
-      newFoodDialogIsOpen: ref(false),
-      updateFoodDialogIsOpen: ref(false),
-      newStepDialogIsOpen: ref(false),
-      updateStepDialogIsOpen: ref(false),
-      ingredientsIdList: ref([]),
-      ingredients: ref([]),
-      ingredientSelected: ref(null),
-      ingredientSelectedId: ref(0),
-      steps: ref([{ id: 1, description: "" }]),
-      stepSelected: ref(null),
-      stepSelectedId: ref(0),
-      description: ref(""),
-      alert: ref(false),
-      alertTitle: ref("Information"),
-      alertText: ref("Vous avez déjà ajouté cet ingrédient."),
-      alertIcon: ref("info"),
-      store,
-    };
-  },
-
-  methods: {
-    openNewFoodDialog() {
-      this.newFoodDialogIsOpen = true;
-    },
-    openUpdateDialog() {
-      this.updateFoodDialogIsOpen = true;
-    },
-    openNewStepDialog() {
-      this.newStepDialogIsOpen = true;
-    },
-    addIngredient(ingredient) {
-      const ingredientList = [...this.ingredients];
-      if (ingredientList.length === 0) {
-        this.ingredientsIdList.push(ingredient.id);
-        this.ingredients.push(ingredient);
-      } else if (this.ingredientsIdList.includes(ingredient.id)) {
-        this.alert = true;
-      } else {
-        this.ingredientsIdList.push(ingredient.id);
-        this.ingredients.push(ingredient);
-      }
-    },
-    showIngredient(ingredient, index) {
-      this.ingredientSelected = ingredient;
-      this.ingredientSelectedId = index;
-      this.updateFoodDialogIsOpen = true;
-    },
-    updateIngredient(ingredient) {
-      this.ingredients[this.ingredientSelectedId] = ingredient;
-    },
-    deleteIngredient() {
-      const ingredientsList = [...this.ingredients];
-      let newIngredientsIdList = [...this.ingredientsIdList];
-      const id = [ingredientsList[this.ingredientSelectedId].id];
-      newIngredientsIdList = newIngredientsIdList.filter(
-        (element) => !id.includes(element)
-      );
-      ingredientsList.splice(this.ingredientSelectedId, 1);
-      this.ingredients = ingredientsList;
-      this.ingredientsIdList = newIngredientsIdList;
-      this.updateFoodDialogIsOpen = false;
-    },
-    addStep(newStep, index) {
-      this.steps[0].description === ""
-        ? (this.steps = [{ id: 1, description: newStep }])
-        : this.steps.push({ id: index + 1, description: newStep });
-    },
-    showStep(step, index) {
-      if (index === 0 && step.description === "") {
-        this.newStepDialogIsOpen = true;
-      } else {
-        this.stepSelected = step;
-        this.stepSelectedId = index;
-        this.updateStepDialogIsOpen = true;
-      }
-    },
-    updateStep(step) {
-      this.steps[this.stepSelectedId] = step;
-    },
-    deleteStep() {
-      this.steps.splice(this.stepSelectedId, 1);
-    },
-    saveRecipe() {
-      if (this.title.length == 0) {
-        errorMessage("Veuillez renseigner le titre");
-      } else if (this.preparationTime === 0 || this.preparationTime === "") {
-        errorMessage("Veuillez renseigner le temps de préparation");
-      } else if (this.preparationTime === 0 || this.preparationTime === null) {
-        errorMessage("Veuillez renseigner le temps de préparation");
-      } else if (this.ingredients.length <= 1) {
-        errorMessage("Veuillez ajouter au moins 2 ingrédients");
-      } else if (this.steps[0].description === "") {
-        errorMessage("Veuillez ajouter au moins 1 étape");
-      } else {
-        const recipe = {
-          type: this.type,
-          title: this.title,
-          nbPerson: this.nbPerson,
-          preparationTime: this.preparationTime,
-          restTime: this.restTime,
-          cookingTime: this.cookingTime,
-          ingredients: this.ingredients,
-          steps: this.steps,
-        };
-        this.store.addRecipe(recipe);
-      }
-    },
-  },
-
-  watch: {
-    preparationTime(val) {
-      val !== "" ? (this.preparationTime = parseInt(val)) : false;
-    },
-    restTime(val) {
-      val !== "" ? (this.restTime = parseInt(val)) : false;
-    },
-    cookingTime(val) {
-      val !== "" ? (this.cookingTime = parseInt(val)) : false;
-    },
-  },
+watch(preparationTime, (val) => {
+  val !== "" ? (preparationTime.value = parseInt(val)) : false;
 });
+
+watch(restTime, (val) => {
+  val !== "" ? (restTime.value = parseInt(val)) : false;
+});
+
+watch(cookingTime, (val) => {
+  val !== "" ? (cookingTime.value = parseInt(val)) : false;
+});
+
+function openNewFoodDialog() {
+  newFoodDialogIsOpen.value = true;
+}
+
+function openUpdateDialog() {
+  updateFoodDialogIsOpen.value = true;
+}
+
+function openNewStepDialog() {
+  newStepDialogIsOpen.value = true;
+}
+
+function addIngredient(ingredient) {
+  const ingredientList = [...ingredients.value];
+  if (ingredientList.length === 0) {
+    ingredientsIdList.value.push(ingredient.id);
+    ingredients.value.push(ingredient);
+  } else if (ingredientsIdList.value.includes(ingredient.id)) {
+    alert.value = true;
+  } else {
+    ingredientsIdList.value.push(ingredient.id);
+    ingredients.value.push(ingredient);
+  }
+}
+
+function showIngredient(ingredient, index) {
+  ingredientSelected.value = ingredient;
+  ingredientSelectedId.value = index;
+  updateFoodDialogIsOpen.value = true;
+}
+
+function updateIngredient(ingredient) {
+  ingredients.value[ingredientSelectedId.value] = ingredient;
+}
+
+function deleteIngredient() {
+  const ingredientsList = [...ingredients.value];
+  let newIngredientsIdList = [...ingredientsIdList.value];
+  const id = [ingredientsList[ingredientSelectedId.value].id];
+  newIngredientsIdList = newIngredientsIdList.filter(
+    (element) => !id.includes(element)
+  );
+  ingredientsList.splice(ingredientSelectedId.value, 1);
+  ingredients.value = ingredientsList;
+  ingredientsIdList.value = newIngredientsIdList;
+  updateFoodDialogIsOpen.value = false;
+}
+
+function addStep(newStep, index) {
+  steps.value[0].description === ""
+    ? (steps.value = [{ id: 1, description: newStep }])
+    : steps.value.push({ id: index + 1, description: newStep });
+}
+
+function showStep(step, index) {
+  if (index === 0 && step.description === "") {
+    newStepDialogIsOpen.value = true;
+  } else {
+    stepSelected.value = step;
+    stepSelectedId.value = index;
+    updateStepDialogIsOpen.value = true;
+  }
+}
+
+function updateStep(step) {
+  steps.value[stepSelectedId.value] = step;
+}
+
+function deleteStep() {
+  steps.value.splice(stepSelectedId.value, 1);
+}
+
+function saveRecipe() {
+  if (title.value.length == 0) {
+    errorMessage("Veuillez renseigner le titre");
+  } else if (preparationTime.value === 0 || preparationTime.value === "") {
+    errorMessage("Veuillez renseigner le temps de préparation");
+  } else if (preparationTime.value === 0 || preparationTime.value === null) {
+    errorMessage("Veuillez renseigner le temps de préparation");
+  } else if (ingredients.value.length <= 1) {
+    errorMessage("Veuillez ajouter au moins 2 ingrédients");
+  } else if (steps.value[0].description === "") {
+    errorMessage("Veuillez ajouter au moins 1 étape");
+  } else {
+    const recipe = {
+      type: type.value,
+      title: title.value,
+      nbPerson: nbPerson.value,
+      preparationTime: preparationTime.value,
+      restTime: restTime.value,
+      cookingTime: cookingTime.value,
+      ingredients: ingredients.value,
+      steps: steps.value,
+    };
+    store.addRecipe(recipe);
+  }
+}
 </script>
 <style lang="scss" scoped></style>
