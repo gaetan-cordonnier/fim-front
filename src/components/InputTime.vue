@@ -11,14 +11,8 @@
   ></q-input>
 </template>
 
-<script>
-import { defineComponent } from "vue";
-
-export default defineComponent({
-  name: "InputTime",
-
-  props: ["label", "icon"],
-});
+<script setup>
+const props = defineProps({ label: String, icon: String });
 </script>
 
 <style lang="scss">
@@ -29,6 +23,6 @@ input::-webkit-inner-spin-button {
 }
 /* Firefox */
 input[type="number"] {
-  -moz-appearance: textfield;
+  appearance: textfield;
 }
 </style>

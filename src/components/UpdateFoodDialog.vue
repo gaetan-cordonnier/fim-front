@@ -42,44 +42,35 @@
   </q-dialog>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue";
+<script setup>
+import { onUpdated, ref } from "vue";
 
-export default defineComponent({
-  name: "NewFoodDialog",
+const props = defineProps({ food: Object });
 
-  props: ["food"],
+const emits = defineEmits(["update-ingredient", "delete-ingredient"]);
 
-  emits: ["update-ingredient", "delete-ingredient"],
+const foodName = ref("");
+const quantity = ref(1);
+const unitOptions = ref(["kg", "g", "mg", "l", "dl", "cl", "ml", "pièce"]);
+const unitType = ref("g");
 
-  setup() {
-    return {
-      foodName: ref(""),
-      quantity: ref(1),
-      unitOptions: ref(["kg", "g", "mg", "l", "dl", "cl", "ml", "pièce"]),
-      unitType: ref("g"),
-    };
-  },
+function updateIngredient() {
+  const ingredient = {
+    id: food.value.id,
+    name: food.value.name,
+    quantity: quantity.value,
+    unit: unitType.value,
+    img: food.value.img,
+  };
+  emits("update-ingredient", ingredient);
+}
 
-  methods: {
-    updateIngredient() {
-      const ingredient = {
-        id: this.food.id,
-        name: this.food.name,
-        quantity: this.quantity,
-        unit: this.unitType,
-        img: this.food.img,
-      };
-      this.$emit("update-ingredient", ingredient);
-    },
-    deleteIngredient() {
-      this.$emit("delete-ingredient");
-    },
-  },
+function deleteIngredient() {
+  emits("delete-ingredient");
+}
 
-  updated() {
-    this.foodName = this.food.name;
-  },
+onUpdated(() => {
+  foodName.value = props.food.name;
 });
 </script>
 <style scoped>

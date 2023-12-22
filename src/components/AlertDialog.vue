@@ -17,14 +17,8 @@
   </q-dialog>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue";
-
-export default defineComponent({
-  name: "AlertDialog",
-
-  props: ["title", "text", "icon"],
-});
+<script setup>
+const props = defineProps({ title: String, text: String, icon: String });
 </script>
 
 <style scoped>

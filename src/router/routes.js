@@ -1,11 +1,8 @@
-
 const routes = [
   {
-    path: '/',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/IndexPage.vue') }
-    ]
+    path: "/",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [{ path: "", component: () => import("pages/IndexPage.vue") }],
   },
   {
     path: "/add-food",
@@ -15,12 +12,16 @@ const routes = [
   {
     path: "/remove-food",
     component: () => import("layouts/MainLayout.vue"),
-    children: [{ path: "", component: () => import("pages/RemoveFoodPage.vue") }],
+    children: [
+      { path: "", component: () => import("pages/RemoveFoodPage.vue") },
+    ],
   },
   {
     path: "/add-recipe",
     component: () => import("layouts/MainLayout.vue"),
-    children: [{ path: "", component: () => import("pages/AddRecipePage.vue") }],
+    children: [
+      { path: "", component: () => import("pages/AddRecipePage.vue") },
+    ],
   },
   {
     path: "/cooking",
@@ -35,15 +36,17 @@ const routes = [
   {
     path: "/shopping-list",
     component: () => import("layouts/MainLayout.vue"),
-    children: [{ path: "", component: () => import("pages/ShoppingListPage.vue") }],
+    children: [
+      { path: "", component: () => import("pages/ShoppingListPage.vue") },
+    ],
   },
 
   // Always leave this as last one,
   // but you can also remove it
   {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue')
-  }
-]
+    path: "/:catchAll(.*)*",
+    component: () => import("pages/ErrorNotFound.vue"),
+  },
+];
 
-export default routes
+export default routes;

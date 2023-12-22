@@ -41,59 +41,49 @@
           @click="food = null"
         />
         <q-btn
-          v-if="foodName !== ''"
           flat
           label="Ajouter"
           @click="addIngredient"
-          v-close-popup
+          v-close-popup="closeDialog"
         />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue";
+<script setup>
+import { ref, watch } from "vue";
 import SearchFood from "./SearchFood.vue";
 
-export default defineComponent({
-  components: { SearchFood },
-  name: "NewFoodDialog",
+const emits = defineEmits(["new-ingredient"]);
 
-  emits: ["new-ingredient"],
+const food = ref(null);
+const foodName = ref("");
+const quantity = ref(1);
+const unitOptions = ref(["kg", "g", "mg", "l", "dl", "cl", "ml", "pièce"]);
+const unitType = ref("g");
+const closeDialog = ref(false);
 
-  setup() {
-    return {
-      food: ref(null),
-      foodName: ref(""),
-      quantity: ref(1),
-      unitOptions: ref(["kg", "g", "mg", "l", "dl", "cl", "ml", "pièce"]),
-      unitType: ref("g"),
-      ingredients: ref([]),
-    };
-  },
-
-  methods: {
-    addIngredient() {
-      const { id, label, img } = this.food;
-      const newIngredient = {
-        id: id,
-        name: label,
-        quantity: this.quantity,
-        unit: this.unitType,
-        img: img,
-      };
-      this.food ? this.$emit("new-ingredient", newIngredient) : false;
-      this.food = null;
-    },
-  },
-
-  watch: {
-    food(val) {
-      val ? (this.foodName = val.label) : false;
-    },
-  },
+watch(food, (val) => {
+  val ? (foodName.value = val.label) : false;
 });
+
+function addIngredient() {
+  if (food.value) {
+    const { id, label, img } = food.value;
+    const newIngredient = {
+      id: id,
+      name: label,
+      quantity: quantity.value,
+      unit: unitType.value,
+      img: img,
+    };
+    food.value ? emits("new-ingredient", newIngredient) : false;
+    food.value = null;
+    foodName.value = "";
+    closeDialog.value = true;
+  }
+}
 </script>
 <style scoped>
 .dialog {

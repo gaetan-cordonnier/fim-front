@@ -38,36 +38,27 @@
   </q-dialog>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue";
+<script setup>
+import { ref } from "vue";
 
-export default defineComponent({
-  name: "NewStepDialog",
+const props = defineProps({ stepIndex: Number });
 
-  props: ["stepIndex"],
+const emits = defineEmits(["new-step"]);
 
-  emits: ["new-step"],
+const step = ref("");
+const closeDialog = ref(false);
 
-  setup() {
-    return {
-      step: ref(""),
-      errorMessage: ref("Vous devez remplir ce champ"),
-      closeDialog: ref(false),
-    };
-  },
+function resetDialog() {
+  closeDialog.value = false;
+  step.value = "";
+}
 
-  methods: {
-    resetDialog() {
-      this.closeDialog = false;
-      this.step = "";
-    },
-    addStep(step) {
-      step.length === 0
-        ? false
-        : (this.$emit("new-step", step), (this.closeDialog = true));
-    },
-  },
-});
+function addStep(step) {
+  console.log(step);
+  step.length === 0
+    ? false
+    : (emits("new-step", step), (closeDialog.value = true));
+}
 </script>
 <style lang="scss" scoped>
 .dialog {

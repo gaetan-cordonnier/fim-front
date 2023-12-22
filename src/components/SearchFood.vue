@@ -13,53 +13,41 @@
   </q-select>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue";
+<script setup>
+import { onMounted, ref } from "vue";
 
-export default defineComponent({
-  name: "SearchBar",
+const props = defineProps({ label: String, icon: String });
 
-  props: ["label", "icon"],
-  emits: ["update-model"],
+const emits = defineEmits(["update-model"]);
 
-  setup() {
-    const stringOptions = ref([]);
-    const options = ref(stringOptions);
+const stringOptions = ref([]);
+const options = ref(stringOptions);
 
-    return {
-      options,
-      stringOptions,
-    };
-  },
-
-  mounted() {
-    this.getAllFoods();
-  },
-
-  methods: {
-    getAllFoods() {
-      const data = [
-        { id: 1, name: "Tomate", img: "nutrition" },
-        { id: 2, name: "Lait", img: "water_full" },
-        { id: 3, name: "Oeuf", img: "egg" },
-        { id: 4, name: "Beurre", img: "nutrition" },
-        { id: 5, name: "Carottes", img: "nutrition" },
-      ];
-      data.forEach((element) => {
-        element.label = element.name;
-        element.value = element.name;
-        delete element.name;
-        this.stringOptions.push(element);
-      });
-    },
-    // filterFn(val, update) {
-    //     update(() => {
-    //       const needle = val.toLowerCase();
-    //       this.options = this.stringOptions.filter(
-    //         (v) => v.toLowerCase().indexOf(needle) > -1
-    //       );
-    //     });
-    //   },
-  },
+onMounted(() => {
+  getAllFoods();
 });
+
+function getAllFoods() {
+  const data = [
+    { id: 1, name: "Tomate", img: "nutrition" },
+    { id: 2, name: "Lait", img: "water_full" },
+    { id: 3, name: "Oeuf", img: "egg" },
+    { id: 4, name: "Beurre", img: "nutrition" },
+    { id: 5, name: "Carottes", img: "nutrition" },
+  ];
+  data.forEach((element) => {
+    element.label = element.name;
+    element.value = element.name;
+    delete element.name;
+    stringOptions.value.push(element);
+  });
+}
+// function filterFn(val, update) {
+//     update(() => {
+//       const needle = val.toLowerCase();
+//       options.value = stringOptions.value.filter(
+//         (v) => v.toLowerCase().indexOf(needle) > -1
+//       );
+//     });
+//   },
 </script>

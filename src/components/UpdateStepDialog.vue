@@ -42,50 +42,41 @@
   </q-dialog>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue";
+<script setup>
+import { ref, watch } from "vue";
 
-export default defineComponent({
-  name: "NewStepDialog",
+const props = defineProps({ stepSelected: Object, stepIndex: Number });
 
-  props: ["stepSelected", "stepIndex"],
+const emits = defineEmits(["update-step", "delete-step"]);
 
-  emits: ["update-step", "delete-step"],
+const step = ref("");
+const stepId = ref(1);
+const closeDialog = ref(false);
 
-  setup() {
-    return {
-      step: ref(""),
-      stepId: ref(1),
-      errorMessage: ref("Vous devez remplir ce champ"),
-      closeDialog: ref(false),
-    };
-  },
-
-  methods: {
-    resetDialog() {
-      this.closeDialog = false;
-    },
-    updateStep(step) {
-      step.length === 0
-        ? false
-        : (this.$emit("update-step", {
-            id: this.stepId,
-            description: step,
-          }),
-          (this.closeDialog = true));
-    },
-    deleteStep() {
-      this.$emit("delete-step");
-    },
-  },
-
-  watch: {
-    stepSelected(val) {
-      this.step = val.description;
-      this.stepId = val.id;
-    },
-  },
+watch(props.stepSelected, (val) => {
+  if (val) {
+    step.value = val.description;
+    stepId.value = val.id;
+  }
 });
+
+function resetDialog() {
+  closeDialog.value = false;
+}
+
+function updateStep(step) {
+  step.length === 0
+    ? false
+    : (emits("update-step", {
+        id: stepId.value,
+        description: step,
+      }),
+      (closeDialog.value = true));
+}
+
+function deleteStep() {
+  emits("delete-step");
+}
 </script>
 <style lang="scss" scoped>
 .dialog {

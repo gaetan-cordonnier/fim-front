@@ -9,13 +9,21 @@
         <p>Bienvenue {{ firstname }}, nous sommes ravis de vous revoir !</p>
       </span>
       <div class="col-6">
-        <home-button icon="do_not_disturb_on" label="Aliment" />
+        <home-button
+          icon="do_not_disturb_on"
+          label="Aliment"
+          @click="openScanner('rmv')"
+        />
       </div>
       <div class="col-6">
-        <home-button icon="add_circle" label="Aliment" @click="openScanner" />
+        <home-button
+          icon="add_circle"
+          label="Aliment"
+          @click="openScanner('add')"
+        />
       </div>
       <div class="col-6">
-        <home-button icon="restaurant_menu" label="Cuisiner" />
+        <home-button icon="restaurant_menu" label="Cuisiner" to="/cooking" />
       </div>
       <div class="col-6">
         <home-button icon="edit_note" label="Recette" to="/add-recipe" />
@@ -43,39 +51,34 @@
   </q-page>
 </template>
 
-<script>
+<script setup>
+import { ref } from "vue";
 import BarCodeReader from "src/components/BarCodeReader.vue";
 import HomeButton from "src/components/HomeButton.vue";
-import { defineComponent, ref } from "vue";
 
-export default defineComponent({
-  name: "IndexPage",
-  components: { BarCodeReader, HomeButton },
-  setup() {
-    return {
-      firstname: ref("Gaëtan"),
-      scannerIsOpen: ref(false),
-      barCode: ref(""),
-    };
-  },
+const firstname = ref("Gaëtan");
+const scannerIsOpen = ref(false);
+const barCode = ref("");
+const action = ref("add");
 
-  methods: {
-    openScanner() {
-      this.scannerIsOpen = true;
-    },
-    closeScanner() {
-      this.scannerIsOpen = false;
-    },
-    onDecode(barCode) {
-      this.barCode = barCode;
-      console.log(barCode);
-      this.scannerIsOpen = this.scannerIsOpen = false;
-    },
-    onLoaded() {
-      console.log("loaded");
-    },
-  },
-});
+function openScanner(addOrRemove) {
+  scannerIsOpen.value = true;
+  action.value = addOrRemove;
+}
+
+function closeScanner() {
+  scannerIsOpen.value = false;
+}
+
+function onDecode(code) {
+  barCode.value = code;
+  console.log(code);
+  scannerIsOpen.value = false;
+}
+
+function onLoaded() {
+  console.log("loaded");
+}
 </script>
 <style lang="scss" scoped>
 .welcome-text {

@@ -9,14 +9,8 @@
   />
 </template>
 
-<script>
-import { defineComponent } from "vue";
-
-export default defineComponent({
-  name: "HomeButton",
-
-  props: ["label", "icon"],
-});
+<script setup>
+const props = defineProps({ label: String, icon: String });
 </script>
 <style scoped>
 .button {
