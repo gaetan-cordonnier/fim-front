@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="4" failures="0" errors="0" time="2.949">
+  <testsuite name="test/jest/__tests__/MyButton.test.js" errors="0" failures="0" skipped="0" timestamp="2023-12-07T22:11:48" time="2.176" tests="4">
+    <testcase classname="MyButton" name="Vérifie la méthode d&apos;incrémentation" time="0.047">
+    </testcase>
+    <testcase classname="MyButton" name="Vérification de l&apos;affichage du texte" time="0.014">
+    </testcase>
+    <testcase classname="MyButton" name="Vérifie si le type de donnée est correcte" time="0.009">
+    </testcase>
+    <testcase classname="MyButton" name="Vérifie le comportement au moment du click" time="0.018">
+    </testcase>
+  </testsuite>
+</testsuites>
