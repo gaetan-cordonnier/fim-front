@@ -172,7 +172,7 @@ import NewFoodDialog from "src/components/NewFoodDialog.vue";
 import UpdateFoodDialog from "src/components/UpdateFoodDialog.vue";
 import NewStepDialog from "src/components/NewStepDialog.vue";
 import UpdateStepDialog from "src/components/UpdateStepDialog.vue";
-import { errorMessage } from "src/utils/Notify";
+import { errorMessage } from "src/utils/notify";
 import { useRecipeStore } from "src/stores/recipeStore";
 
 const store = useRecipeStore();
