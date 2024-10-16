@@ -1,0 +1,4 @@
+{
+  "*.(js|html|css)": ["prettier --write"],
+  "**/*.{js,vue}": ["npm run lint:js:fix"]
+}
