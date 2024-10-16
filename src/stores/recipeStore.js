@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { api } from "../boot/axios";
-import { positiveMessage, errorMessage } from "src/utils/Notify";
+import { positiveMessage, errorMessage } from "src/utils/notify";
 
 export const useRecipeStore = defineStore("recipe", {
   state: () => ({
